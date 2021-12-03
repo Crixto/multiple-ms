@@ -285,10 +285,10 @@ function isValid(matches: string[], separators: string[], str: string): boolean 
 }
 
 function check(options: ParseOptions) {
-	if (options.language !== undefined) {
-		if (!['es', 'en'].includes(options.language)) options.language = undefined;
+	if ('language' in options) {
+		if (!['es', 'en'].includes(options.language!)) options.language = undefined;
 	}
-	if (options.separator !== undefined) {
+	if ('separator' in options) {
 		if (
 			typeof options.separator !== 'string' &&
 			!(
