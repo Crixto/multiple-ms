@@ -83,8 +83,7 @@ const es: string[] = [
 ];
 const en: string[] = [
 	'years?',
-	'yrs',
-	'yr',
+	'yrs?',
 	'months?',
 	'mo',
 	'weeks?',
@@ -116,6 +115,7 @@ export = function parse(
 	let separator: string[] = [' '];
 	let language: 'es' | 'en' | undefined = undefined;
 	let opt: boolean = true;
+	let strict: boolean = true;
 	if (typeof str !== 'string') throw new Error('Invalid type.');
 	if (idt !== undefined) {
 		if (!['boolean', 'object'].includes(typeof idt))
@@ -127,6 +127,7 @@ export = function parse(
 			check(idt);
 			language = idt.language;
 			if (idt.separator !== undefined) separator = idt.separator as string[];
+			if (idt.strict !== undefined) strict = idt.strict;
 		}
 	}
 	if (options !== undefined && opt === true) {
@@ -135,6 +136,7 @@ export = function parse(
 		check(options);
 		language = options.language;
 		if (options.separator !== undefined) separator = options.separator as string[];
+		if (options.strict !== undefined) strict = options.strict;
 	}
 	const units: string =
 		language !== undefined
@@ -142,7 +144,7 @@ export = function parse(
 			: es.join('|') + en.join('|') + global.join('|');
 	const matches = str.match(new RegExp(`\\d+ *(${units})`, 'gi'));
 
-	if (matches === null || !isValid(matches, separator, str)) return undefined;
+	if (matches === null || (strict && !isValid(matches, separator, str))) return undefined;
 
 	const final = {
 		years: 0,
@@ -156,12 +158,23 @@ export = function parse(
 	let time: number = 0;
 	for (const match of matches) {
 		const n = parseFloat(match);
-		const type = match
-			.replace(new RegExp(`(\\d|${separator.join('|')})+`, 'g'), '')
-			.toLowerCase()
-			.trim() as Units;
-
 		if (n <= 0) continue;
+
+		const type = match
+			.replace(
+				new RegExp(
+					`(\\d|${separator
+						.map((x) =>
+							Array.from(x)
+								.map((x) => `\\${x}`)
+								.join('')
+						)
+						.join('|')})+`,
+					'g'
+				),
+				''
+			)
+			.trim() as Units;
 
 		switch (type) {
 			case 'years':
@@ -229,7 +242,7 @@ export = function parse(
 			case 'seg':
 			case 's':
 				final.seconds += n;
-				time += n + second;
+				time += n * second;
 				break;
 			default:
 				time += n;
@@ -254,10 +267,21 @@ export = function parse(
 };
 
 function isValid(matches: string[], separators: string[], str: string): boolean {
-	for (const separator of separators) {
-		if (matches.join(separator) === str) return true;
-	}
-	return false;
+	return new RegExp(
+		`^${matches.join(
+			`(${separators
+				.map((x) =>
+					Array.from(x)
+						.map((x) => `\\${x}`)
+						.join('')
+				)
+				.join('|')})`
+		)}$`
+	).test(str.trim());
+	// for (const separator of separators) {
+	// 	if (matches.join(separator) === str) return true;
+	// }
+	// return false;
 }
 
 function check(options: ParseOptions) {
@@ -275,6 +299,8 @@ function check(options: ParseOptions) {
 			options.separator = [' '];
 		else if (typeof options.separator === 'string') options.separator = [options.separator];
 	}
+	if (options.strict !== undefined && typeof options.strict !== 'boolean')
+		options.strict = true;
 	return options;
 }
 

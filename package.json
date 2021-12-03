@@ -1,6 +1,6 @@
 {
 	"name": "multiple-ms",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
@@ -17,5 +17,8 @@
 	"license": "ISC",
 	"devDependencies": {
 		"typescript": "^4.5.2"
+	},
+	"repository": {
+		"url": "https://github.com/Crixto/multiple-ms"
 	}
 }
