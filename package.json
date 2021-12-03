@@ -1,0 +1,21 @@
+{
+	"name": "multiple-ms",
+	"version": "0.5.0",
+	"description": "",
+	"main": "dist/index.js",
+	"scripts": {
+		"test": "node index.test.js",
+		"build": "tsc -p ."
+	},
+	"types": "src/types/index.d.ts",
+	"keywords": [
+		"ms",
+		"seconds",
+		"miliseconds"
+	],
+	"author": "cr1xto",
+	"license": "ISC",
+	"devDependencies": {
+		"typescript": "^4.5.2"
+	}
+}

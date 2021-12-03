@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"strict": true,
+		"outDir": "dist",
+		"declaration": true,
+		"lib": ["ESNext"],
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"target": "ESNext"
+	},
+	"include": ["src"],
+	"exclude": ["node_modules"]
+}
