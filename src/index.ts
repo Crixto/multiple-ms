@@ -71,7 +71,7 @@ const les: { [x: string]: Props } = {
 };
 
 const es: string[] = [
-	'anos?',
+	'años?',
 	'a',
 	'mes(es)?',
 	'semanas?',
@@ -178,7 +178,7 @@ export = function parse(
 
 		switch (type) {
 			case 'years':
-			case 'anos':
+			case 'años':
 			case 'year':
 			case 'ano':
 			case 'yrs':

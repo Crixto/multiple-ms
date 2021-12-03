@@ -1,6 +1,6 @@
 export type Units =
 	| 'years'
-	| 'anos'
+	| 'años'
 	| 'year'
 	| 'ano'
 	| 'yrs'
