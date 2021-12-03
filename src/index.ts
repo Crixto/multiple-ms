@@ -299,8 +299,8 @@ function check(options: ParseOptions) {
 			options.separator = [' '];
 		else if (typeof options.separator === 'string') options.separator = [options.separator];
 	}
-	if (options.strict !== undefined && typeof options.strict !== 'boolean')
-		options.strict = true;
+	if (typeof options.strict !== 'boolean')
+		options.strict = false;
 	return options;
 }
 
