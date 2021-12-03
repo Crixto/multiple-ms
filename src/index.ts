@@ -119,7 +119,7 @@ export = function parse(
 	if (typeof str !== 'string') throw new Error('Invalid type.');
 	if (idt !== undefined) {
 		if (!['boolean', 'object'].includes(typeof idt))
-			throw new Error("Options don't have a valid type.");
+			throw new Error("Options doesn't have a valid type.");
 
 		if (typeof idt === 'boolean') length = idt;
 		else {
@@ -131,7 +131,7 @@ export = function parse(
 		}
 	}
 	if (options !== undefined && opt === true) {
-		if (typeof options !== 'object') throw new Error("Options don't have a valid type.");
+		if (typeof options !== 'object') throw new Error("Options doesn't have a valid type.");
 
 		check(options);
 		language = options.language;
