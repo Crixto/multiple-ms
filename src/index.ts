@@ -116,10 +116,10 @@ export = function parse(
 	let language: 'es' | 'en' | undefined = undefined;
 	let opt: boolean = true;
 	let strict: boolean = true;
-	if (typeof str !== 'string') throw new Error('Invalid type.');
+	if (typeof str !== 'string') throw new Error(`Invalid type, espected type of "string", got "${typeof str}"`);
 	if (idt !== undefined) {
 		if (!['boolean', 'object'].includes(typeof idt))
-			throw new Error("Options doesn't have a valid type.");
+			throw new Error(`Invalid type, espected type of "boolean" or "object", got "${typeof idt}"`);
 
 		if (typeof idt === 'boolean') length = idt;
 		else {
@@ -131,7 +131,7 @@ export = function parse(
 		}
 	}
 	if (options !== undefined && opt === true) {
-		if (typeof options !== 'object') throw new Error("Options doesn't have a valid type.");
+		if (typeof options !== 'object') throw new Error(`Invalid type, espected type of "object", got "${typeof idt}"`);
 
 		check(options);
 		language = options.language;
