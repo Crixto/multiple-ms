@@ -1,7 +1,7 @@
 {
 	"name": "multiple-ms",
-	"version": "0.5.1",
-	"description": "",
+	"version": "0.7.5",
+	"description": "Converts a string to milliseconds",
 	"main": "dist/index.js",
 	"scripts": {
 		"test": "node index.test.js",
@@ -11,10 +11,10 @@
 	"keywords": [
 		"ms",
 		"seconds",
-		"miliseconds"
+		"milliseconds"
 	],
 	"author": "cr1xto",
-	"license": "ISC",
+	"license": "MIT",
 	"devDependencies": {
 		"typescript": "^4.5.2"
 	},

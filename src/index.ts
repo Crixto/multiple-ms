@@ -1,125 +1,35 @@
 import type { Units } from './types/Units';
-import type { ParseOptions, Props } from './types/Options';
-const second = 1000;
-const minute = second * 60;
-const hour = minute * 60;
-const day = hour * 24;
-const week = day * 7;
-const month = week * 4;
-const year = day * 365;
-
-const len: { [x: string]: Props } = {
-	years: {
-		name: 'year',
-		plural: 'years'
-	},
-	months: {
-		name: 'month',
-		plural: 'months'
-	},
-	weeks: {
-		name: 'week',
-		plural: 'weeks'
-	},
-	days: {
-		name: 'day',
-		plural: 'days'
-	},
-	hours: {
-		name: 'hour',
-		plural: 'hours'
-	},
-	minutes: {
-		name: 'minute',
-		plural: 'minutes'
-	},
-	seconds: {
-		name: 'second',
-		plural: 'seconds'
-	}
-};
-
-const les: { [x: string]: Props } = {
-	years: {
-		name: 'año',
-		plural: 'años'
-	},
-	months: {
-		name: 'mes',
-		plural: 'meses'
-	},
-	weeks: {
-		name: 'semana',
-		plural: 'semanas'
-	},
-	days: {
-		name: 'día',
-		plural: 'días'
-	},
-	hours: {
-		name: 'hora',
-		plural: 'horas'
-	},
-	minutes: {
-		name: 'minuto',
-		plural: 'minutos'
-	},
-	seconds: {
-		name: 'segundo',
-		plural: 'segundos'
-	}
-};
-
-const es: string[] = [
-	'anos?',
-	'a',
-	'mes(es)?',
-	'semanas?',
-	'dias?',
-	'horas?',
-	'minutos?',
-	'segundos?',
-	'segs?'
-];
-const en: string[] = [
-	'years?',
-	'yrs?',
-	'months?',
-	'mo',
-	'weeks?',
-	'days?',
-	'hours?',
-	'minutes?',
-	'seconds?',
-	'secs?'
-];
-const global: string[] = ['y', 'w', 'd', 'hrs?', 'h', 'mins?', 'm', 's'];
-
-const langs = {
+import type { ParseOptions } from './types/Options';
+import {
+	day,
+	en,
 	es,
-	en
-};
-
-const late: { es: { [y: string]: Props }; en: { [y: string]: Props } } = {
-	es: les,
-	en: len
-};
+	global,
+	hour,
+	langs,
+	late,
+	minute,
+	month,
+	second,
+	week,
+	year
+} from './utils';
 
 export = function parse(
 	str: string,
 	idt?: boolean | ParseOptions,
 	options?: ParseOptions
 ): string | number | undefined {
+	if (typeof str !== 'string') throw new Error('Invalid type.');
 	str = clean(str);
 	let length: boolean = false;
 	let separator: string[] = [' '];
 	let language: 'es' | 'en' | undefined = undefined;
 	let opt: boolean = true;
-	let strict: boolean = true;
-	if (typeof str !== 'string') throw new Error('Invalid type.');
+	let strict: boolean = false;
 	if (idt !== undefined) {
 		if (!['boolean', 'object'].includes(typeof idt))
-			throw new Error("Options don't have a valid type.");
+			throw new Error("Options doesn't have a valid type.");
 
 		if (typeof idt === 'boolean') length = idt;
 		else {
@@ -130,8 +40,8 @@ export = function parse(
 			if (idt.strict !== undefined) strict = idt.strict;
 		}
 	}
-	if (options !== undefined && opt === true) {
-		if (typeof options !== 'object') throw new Error("Options don't have a valid type.");
+	if (options !== undefined && opt) {
+		if (typeof options !== 'object') throw new Error("Options doesn't have a valid type.");
 
 		check(options);
 		language = options.language;
@@ -156,7 +66,7 @@ export = function parse(
 		seconds: 0
 	};
 	let time: number = 0;
-	for (const match of matches) {
+	for (let match of matches) {
 		const n = parseFloat(match);
 		if (n <= 0) continue;
 
@@ -166,7 +76,7 @@ export = function parse(
 					`(\\d|${separator
 						.map((x) =>
 							Array.from(x)
-								.map((x) => `\\${x}`)
+								.map((y) => (['d', 'w', 's', 'b'].includes(y.toLowerCase()) ? y : `\\${y}`))
 								.join('')
 						)
 						.join('|')})+`,
@@ -269,13 +179,13 @@ export = function parse(
 function isValid(matches: string[], separators: string[], str: string): boolean {
 	return new RegExp(
 		`^${matches.join(
-			`(${separators
+			`( *(${separators
 				.map((x) =>
 					Array.from(x)
-						.map((x) => `\\${x}`)
+						.map((y) => (['d', 'w', 's', 'b'].includes(y.toLowerCase()) ? y : `\\${y}`))
 						.join('')
 				)
-				.join('|')})`
+				.join('|')}) *)?`
 		)}$`
 	).test(str.trim());
 	// for (const separator of separators) {
@@ -285,9 +195,8 @@ function isValid(matches: string[], separators: string[], str: string): boolean 
 }
 
 function check(options: ParseOptions) {
-	if (options.language !== undefined) {
-		if (!['es', 'en'].includes(options.language)) options.language = undefined;
-	}
+	if (options.language !== undefined && !['es', 'en'].includes(options.language))
+		options.language = undefined;
 	if (options.separator !== undefined) {
 		if (
 			typeof options.separator !== 'string' &&
@@ -299,8 +208,7 @@ function check(options: ParseOptions) {
 			options.separator = [' '];
 		else if (typeof options.separator === 'string') options.separator = [options.separator];
 	}
-	if (options.strict !== undefined && typeof options.strict !== 'boolean')
-		options.strict = true;
+	if (typeof options.strict !== 'boolean') options.strict = false;
 	return options;
 }
 

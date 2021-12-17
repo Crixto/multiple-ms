@@ -4,7 +4,6 @@
 		"noImplicitReturns": true,
 		"strict": true,
 		"outDir": "dist",
-		"declaration": true,
 		"lib": ["ESNext"],
 		"module": "CommonJS",
 		"moduleResolution": "Node",
