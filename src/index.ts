@@ -12,14 +12,16 @@ import {
 	month,
 	second,
 	week,
-	year
+	year,
+	numberRegex
 } from './utils';
+import escape = require('escape-string-regexp');
 
 export = function parse(
 	str: string,
 	idt?: boolean | ParseOptions,
 	options?: ParseOptions
-): string | number | undefined {
+): string | number {
 	if (typeof str !== 'string') throw new Error('Invalid type.');
 	str = clean(str);
 	let length: boolean = false;
@@ -50,11 +52,15 @@ export = function parse(
 	}
 	const units: string =
 		language !== undefined
-			? langs[language].join('|') + global.join('|')
-			: es.join('|') + en.join('|') + global.join('|');
-	const matches = str.match(new RegExp(`\\d+ *(${units})`, 'gi'));
+			? langs[language].join('|') + '|' + global.join('|')
+			: es.join('|') + '|' + en.join('|') + '|' + global.join('|');
+	let matches = str.match(new RegExp(`${numberRegex} *(${units})`, 'gi'));
 
-	if (matches === null || (strict && !isValid(matches, separator, str))) return undefined;
+	if (matches === null) return 0;
+
+	const valid = isValid(separator, str, strict, units);
+	if (valid === undefined) return 0;
+	matches = valid;
 
 	const final = {
 		years: 0,
@@ -68,7 +74,7 @@ export = function parse(
 	let time: number = 0;
 	for (let match of matches) {
 		const n = parseFloat(match);
-		if (n <= 0) continue;
+		if (n === 0) continue;
 
 		const type = match
 			.replace(
@@ -76,7 +82,11 @@ export = function parse(
 					`(\\d|${separator
 						.map((x) =>
 							Array.from(x)
-								.map((y) => (['d', 'w', 's', 'b'].includes(y.toLowerCase()) ? y : `\\${y}`))
+								.map((y) =>
+									['d', 'w', 's', 'b'].includes(y.toLowerCase())
+										? y
+										: `\\${y}`
+								)
 								.join('')
 						)
 						.join('|')})+`,
@@ -164,34 +174,40 @@ export = function parse(
 			.filter((x) => x[1] > 0)
 			.map((x) => {
 				const pos: string =
-					x[1] >= 2 ? late[language ?? 'en'][x[0]].plural : late[language ?? 'en'][x[0]].name;
+					x[1] >= 2
+						? late[language ?? 'en'][x[0]].plural
+						: late[language ?? 'en'][x[0]].name;
 
 				return `${x[1]} ${pos}`;
 			});
 
-		if (name.length === 0) return undefined;
 		return name.join(', ');
 	}
 
 	return time;
 };
 
-function isValid(matches: string[], separators: string[], str: string): boolean {
-	return new RegExp(
-		`^${matches.join(
-			`( *(${separators
-				.map((x) =>
-					Array.from(x)
-						.map((y) => (['d', 'w', 's', 'b'].includes(y.toLowerCase()) ? y : `\\${y}`))
-						.join('')
-				)
-				.join('|')}) *)?`
-		)}$`
-	).test(str.trim());
-	// for (const separator of separators) {
-	// 	if (matches.join(separator) === str) return true;
-	// }
-	// return false;
+function isValid(
+	separators: string[],
+	str: string,
+	strict: boolean,
+	units: string
+): string[] | undefined {
+	const separator = separators.map((x) => escape(x)).join('|');
+	const unit = `${numberRegex} *(${units})`;
+	const [newMatch] =
+		str.match(
+			new RegExp(
+				`${strict ? '^' : ''}${numberRegex} *(${units})(${separator}${unit})*${
+					strict ? '$' : ''
+				}`
+			)
+		) ?? [];
+	if (newMatch === undefined) return undefined;
+	const matches = newMatch.match(new RegExp(unit, 'g'));
+	if (matches === null) return undefined;
+
+	return matches;
 }
 
 function check(options: ParseOptions) {
@@ -206,7 +222,8 @@ function check(options: ParseOptions) {
 			)
 		)
 			options.separator = [' '];
-		else if (typeof options.separator === 'string') options.separator = [options.separator];
+		else if (typeof options.separator === 'string')
+			options.separator = [options.separator];
 	}
 	if (typeof options.strict !== 'boolean') options.strict = false;
 	return options;

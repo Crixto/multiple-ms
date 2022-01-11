@@ -1,6 +1,6 @@
 {
 	"name": "multiple-ms",
-	"version": "0.7.5",
+	"version": "0.8.0",
 	"description": "Converts a string to milliseconds",
 	"main": "dist/index.js",
 	"scripts": {
@@ -20,5 +20,8 @@
 	},
 	"repository": {
 		"url": "https://github.com/Crixto/multiple-ms"
+	},
+	"dependencies": {
+		"escape-string-regexp": "^4.0.0"
 	}
 }

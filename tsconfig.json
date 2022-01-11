@@ -4,7 +4,7 @@
 		"noImplicitReturns": true,
 		"strict": true,
 		"outDir": "dist",
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"module": "CommonJS",
 		"moduleResolution": "Node",
 		"target": "ESNext"

@@ -8,7 +8,7 @@ export const week = day * 7;
 export const month = week * 4;
 export const year = day * 365;
 
-export const len: { [x: string]: Props } = {
+const len: { [x: string]: Props } = {
 	years: {
 		name: 'year',
 		plural: 'years'
@@ -39,7 +39,7 @@ export const len: { [x: string]: Props } = {
 	}
 };
 
-export const les: { [x: string]: Props } = {
+const les: { [x: string]: Props } = {
 	years: {
 		name: 'año',
 		plural: 'años'
@@ -104,3 +104,5 @@ export const late: { es: { [y: string]: Props }; en: { [y: string]: Props } } = 
 	es: les,
 	en: len
 };
+
+export const numberRegex = '-?\\d+(\\.\\d+)?';
