@@ -21,7 +21,7 @@ export = function parse(
 	str: string,
 	idt?: boolean | ParseOptions,
 	options?: ParseOptions
-): string | number {
+): string | number | null {
 	if (typeof str !== 'string') throw new Error('Invalid type.');
 	str = clean(str);
 	let length: boolean = false;
@@ -56,10 +56,10 @@ export = function parse(
 			: es.join('|') + '|' + en.join('|') + '|' + global.join('|');
 	let matches = str.match(new RegExp(`${numberRegex} *(${units})`, 'gi'));
 
-	if (matches === null) return 0;
+	if (matches === null) return length ? null : NaN;
 
 	const valid = isValid(separator, str, strict, units);
-	if (valid === undefined) return 0;
+	if (valid === undefined) return length ? null : NaN;
 	matches = valid;
 
 	const final = {
@@ -181,6 +181,7 @@ export = function parse(
 				return `${x[1]} ${pos}`;
 			});
 
+		if (name.length === 0) return null;
 		return name.join(', ');
 	}
 
