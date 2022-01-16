@@ -1,7 +1,7 @@
 {
 	"name": "multiple-ms",
-	"version": "0.8.1",
-	"description": "Converts a string to milliseconds",
+	"version": "0.8.5",
+	"description": "Converts a string to milliseconds.",
 	"main": "dist/index.js",
 	"scripts": {
 		"test": "node index.test.js",

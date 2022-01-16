@@ -74,27 +74,9 @@ export = function parse(
 	let time: number = 0;
 	for (let match of matches) {
 		const n = parseFloat(match);
-		if (n === 0) continue;
+		if (n === 0 || isNaN(n)) continue;
 
-		const type = match
-			.replace(
-				new RegExp(
-					`(\\d|${separator
-						.map((x) =>
-							Array.from(x)
-								.map((y) =>
-									['d', 'w', 's', 'b'].includes(y.toLowerCase())
-										? y
-										: `\\${y}`
-								)
-								.join('')
-						)
-						.join('|')})+`,
-					'g'
-				),
-				''
-			)
-			.trim() as Units;
+		const type = match.slice(n.toString().length).trim() as Units;
 
 		switch (type) {
 			case 'years':
@@ -194,7 +176,7 @@ function isValid(
 	strict: boolean,
 	units: string
 ): string[] | undefined {
-	const separator = separators.map((x) => escape(x)).join('|');
+	const separator = `(${separators.map((x) => escape(x)).join('|')})`;
 	const unit = `${numberRegex} *(${units})`;
 	const [newMatch] =
 		str.match(
