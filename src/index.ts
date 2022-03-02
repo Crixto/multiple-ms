@@ -1,5 +1,4 @@
-import type { Units } from './types/Units';
-import type { ParseOptions } from './types/Options';
+import type { ParseOptions, ResolvedOptions, Units } from './types';
 import {
 	day,
 	en,
@@ -17,50 +16,30 @@ import {
 } from './utils';
 import escape = require('escape-string-regexp');
 
-export = function parse(
+export = function parse<L extends boolean = false>(
 	str: string,
-	idt?: boolean | ParseOptions,
-	options?: ParseOptions
+	opt?: L | ParseOptions<L>
 ): string | number | null {
-	if (typeof str !== 'string') throw new Error('Invalid type.');
+	if (typeof str !== 'string') throw new TypeError('Invalid type.');
 	str = clean(str);
-	let length: boolean = false;
-	let separator: string[] = [' '];
-	let language: 'es' | 'en' | undefined = undefined;
-	let opt: boolean = true;
-	let strict: boolean = false;
-	if (idt !== undefined) {
-		if (!['boolean', 'object'].includes(typeof idt))
-			throw new Error("Options doesn't have a valid type.");
+	const options: ResolvedOptions = {
+		length: false,
+		separator: [' '],
+		strict: false
+	};
+	if (opt !== undefined) {
+		if (!['boolean', 'object'].includes(typeof options))
+			throw new TypeError("Options doesn't have a valid type.");
 
-		if (typeof idt === 'boolean') length = idt;
-		else {
-			opt = false;
-			check(idt);
-			language = idt.language;
-			if (idt.separator !== undefined) separator = idt.separator as string[];
-			if (idt.strict !== undefined) strict = idt.strict;
-		}
-	}
-	if (options !== undefined && opt) {
-		if (typeof options !== 'object') throw new Error("Options doesn't have a valid type.");
-
-		check(options);
-		language = options.language;
-		if (options.separator !== undefined) separator = options.separator as string[];
-		if (options.strict !== undefined) strict = options.strict;
+		if (typeof opt === 'boolean') options.length = opt;
+		else Object.assign(options, check(opt));
 	}
 	const units: string =
-		language !== undefined
-			? langs[language].join('|') + '|' + global.join('|')
+		options.language !== undefined
+			? langs[options.language].join('|') + '|' + global.join('|')
 			: es.join('|') + '|' + en.join('|') + '|' + global.join('|');
-	let matches = str.match(new RegExp(`${numberRegex} *(${units})`, 'gi'));
-
-	if (matches === null) return length ? null : NaN;
-
-	const valid = isValid(separator, str, strict, units);
-	if (valid === undefined) return length ? null : NaN;
-	matches = valid;
+	const matches = isValid(options.separator, str, options.strict, units);
+	if (matches === undefined) return options.length ? null : NaN;
 
 	const final = {
 		years: 0,
@@ -80,9 +59,9 @@ export = function parse(
 
 		switch (type) {
 			case 'years':
-			case 'anos':
+			case 'años':
 			case 'year':
-			case 'ano':
+			case 'año':
 			case 'yrs':
 			case 'yr':
 			case 'y':
@@ -151,14 +130,14 @@ export = function parse(
 		}
 	}
 
-	if (length) {
+	if (options.length) {
 		const name = (Object.entries(final) as [keyof typeof final, number][])
 			.filter((x) => x[1] > 0)
 			.map((x) => {
 				const pos: string =
-					x[1] >= 2
-						? late[language ?? 'en'][x[0]].plural
-						: late[language ?? 'en'][x[0]].name;
+					x[1] >= 2 || x[1] <= -2
+						? late[options.language ?? 'en'][x[0]].plural
+						: late[options.language ?? 'en'][x[0]].name;
 
 				return `${x[1]} ${pos}`;
 			});
@@ -177,23 +156,24 @@ function isValid(
 	units: string
 ): string[] | undefined {
 	const separator = `(${separators.map((x) => escape(x)).join('|')})`;
-	const unit = `${numberRegex} *(${units})`;
 	const [newMatch] =
 		str.match(
 			new RegExp(
-				`${strict ? '^' : ''}${numberRegex} *(${units})(${separator}${unit})*${
+				`${
+					strict ? '^' : ''
+				}${numberRegex} *(${units})(${separator}${numberRegex} *(${units}))*${
 					strict ? '$' : ''
-				}`
+				}`,
+				'i'
 			)
 		) ?? [];
 	if (newMatch === undefined) return undefined;
-	const matches = newMatch.match(new RegExp(unit, 'g'));
-	if (matches === null) return undefined;
+	const matches = newMatch.split(new RegExp(separator, 'i'));
 
 	return matches;
 }
 
-function check(options: ParseOptions) {
+function check(options: ParseOptions<boolean>) {
 	if (options.language !== undefined && !['es', 'en'].includes(options.language))
 		options.language = undefined;
 	if (options.separator !== undefined) {
@@ -209,12 +189,14 @@ function check(options: ParseOptions) {
 			options.separator = [options.separator];
 	}
 	if (typeof options.strict !== 'boolean') options.strict = false;
+	if (typeof options.length !== 'boolean') options.length = true;
 	return options;
 }
 
 function clean(str: string): string {
 	return str
 		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/([\u0300-\u0302]|[\u0304-\u030f])/g, '')
+		.normalize()
 		.toLowerCase();
 }

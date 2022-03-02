@@ -1,6 +1,6 @@
 {
 	"name": "multiple-ms",
-	"version": "0.8.5",
+	"version": "0.8.7",
 	"description": "Converts a string to milliseconds.",
 	"main": "dist/index.js",
 	"scripts": {

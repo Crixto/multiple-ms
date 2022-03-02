@@ -4,7 +4,7 @@ Convert a string to milliseconds with a simple format.
 
 ## Install
 
-```
+```sh
 $ npm install multiple-ms
 ```
 

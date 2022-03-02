@@ -1,4 +1,4 @@
-import type { Props } from './types/Options';
+import type { Props } from './types';
 
 export const second = 1000;
 export const minute = second * 60;
@@ -71,8 +71,7 @@ const les: { [x: string]: Props } = {
 };
 
 export const es: string[] = [
-	'anos?',
-	'a',
+	'a(ños?)?',
 	'mes(es)?',
 	'semanas?',
 	'dias?',
@@ -84,8 +83,7 @@ export const es: string[] = [
 export const en: string[] = [
 	'years?',
 	'yrs?',
-	'months?',
-	'mo',
+	'mo(nths?)?',
 	'weeks?',
 	'days?',
 	'hours?',

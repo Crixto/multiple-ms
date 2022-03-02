@@ -1,10 +1,13 @@
-import type { ParseOptions } from './Options';
+import type { ParseOptions } from '.';
 
-declare function parser(ms: string): number;
-declare function parser(ms: string, length: true): string | null;
-declare function parser(ms: string, length: false): number;
-declare function parser(ms: string, options: ParseOptions): number;
-declare function parser(ms: string, length: true, options: ParseOptions): string | null;
-declare function parser(ms: string, length: false, options: ParseOptions): number;
+declare function parse(ms: string): number;
+declare function parse<L extends boolean>(
+	ms: string,
+	length: L
+): L extends true ? string | null : number;
+declare function parse<L extends boolean = false>(
+	ms: string,
+	options: ParseOptions<L>
+): L extends true ? string | null : number;
 
-export = parser;
+export = parse;

@@ -1,8 +1,26 @@
+export interface ParseOptions<L extends boolean> {
+	language?: 'es' | 'en';
+	separator?: string | string[];
+	strict?: boolean;
+	length?: L;
+}
+
+export interface ResolvedOptions extends ParseOptions<boolean> {
+	separator: string[];
+	strict: boolean;
+	length: boolean;
+}
+
+export interface Props {
+	name: string;
+	plural: string;
+}
+
 export type Units =
 	| 'years'
-	| 'anos'
+	| 'años'
 	| 'year'
-	| 'ano'
+	| 'año'
 	| 'yrs'
 	| 'yr'
 	| 'y'
