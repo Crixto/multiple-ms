@@ -103,4 +103,6 @@ export const late: { es: { [y: string]: Props }; en: { [y: string]: Props } } = 
 	en: len
 };
 
-export const numberRegex = '-?\\d+(\\.\\d+)?';
+// -?(\\.\\d+(e\\d+)?|\\d+(\\.\\d+(e\\d+)?)?|\\d+(e\\d+)?)
+export const numberRegex =
+	'-?(\\.?\\d(\\d|_\\d+)*(e\\d)?(\\d|_\\d+)*|\\d(\\d|_\\d+)*(\\.\\d(\\d|_\\d+)*(e\\d)?(\\d|_\\d+)*)?)';

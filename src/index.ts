@@ -52,10 +52,12 @@ export = function parse<L extends boolean = false>(
 	};
 	let time: number = 0;
 	for (let match of matches) {
-		const n = parseFloat(match);
+		const m = match.match(new RegExp(`^${numberRegex}`, 'i'))![0];
+		const n = Number(m.replaceAll('_', ''));
+		// const n = parseFloat(match);
 		if (n === 0 || isNaN(n)) continue;
 
-		const type = match.slice(n.toString().length).trim() as Units;
+		const type = match.slice(m.length).trim() as Units;
 
 		switch (type) {
 			case 'years':
@@ -132,7 +134,7 @@ export = function parse<L extends boolean = false>(
 
 	if (options.length) {
 		const name = (Object.entries(final) as [keyof typeof final, number][])
-			.filter((x) => x[1] > 0)
+			.filter((x) => x[1] !== 0)
 			.map((x) => {
 				const pos: string =
 					x[1] >= 2 || x[1] <= -2
@@ -155,20 +157,17 @@ function isValid(
 	strict: boolean,
 	units: string
 ): string[] | undefined {
+	const unit = `${numberRegex} *(${units})`;
 	const separator = `(${separators.map((x) => escape(x)).join('|')})`;
 	const [newMatch] =
 		str.match(
 			new RegExp(
-				`${
-					strict ? '^' : ''
-				}${numberRegex} *(${units})(${separator}${numberRegex} *(${units}))*${
-					strict ? '$' : ''
-				}`,
+				`${strict ? '^' : ''}${unit}(${separator}${unit})*${strict ? '$' : ''}`,
 				'i'
 			)
 		) ?? [];
 	if (newMatch === undefined) return undefined;
-	const matches = newMatch.split(new RegExp(separator, 'i'));
+	const matches = newMatch.match(new RegExp(unit, 'gi')) ?? undefined;
 
 	return matches;
 }
@@ -189,7 +188,7 @@ function check(options: ParseOptions<boolean>) {
 			options.separator = [options.separator];
 	}
 	if (typeof options.strict !== 'boolean') options.strict = false;
-	if (typeof options.length !== 'boolean') options.length = true;
+	if (typeof options.length !== 'boolean') options.length = false;
 	return options;
 }
 

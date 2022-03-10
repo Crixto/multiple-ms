@@ -8,18 +8,19 @@ Convert a string to milliseconds with a simple format.
 $ npm install multiple-ms
 ```
 
-## Example
+## Examples
 
 ```js
-const parser = require('multiple-ms');
+const parse = require('multiple-ms');
 
-parser('1 hour'); // 3600000
-parser('3d', true); // 3 days
-parser('2w hi', { strict: true }); // NaN
-parser('2h, 30m hi 80 hours', { separator: ', ' }); // 9000000
-parser('2h 30m', { separator: ', ', strict: true }); // NaN
-parser('2 h', true, { language: 'es' }); // 2 horas
-parser('2 horas', { language: 'en', strict: true }); // NaN
+parse('1 hour'); // 3600000
+parse('1_100 s'); // 1100000
+parse('3d', true); // 3 days
+parse('2w hi', { strict: true }); // NaN
+parse('2h, 30m hi 80 hours', { separator: ', ' }); // 9000000
+parse('2h 30m', { separator: ', ', strict: true }); // NaN
+parse('2 h', { language: 'es', length: true }); // 2 horas
+parse('2 horas', { language: 'en', strict: true }); // NaN
 ```
 
 ## Usage
@@ -27,8 +28,7 @@ parser('2 horas', { language: 'en', strict: true }); // NaN
 | Parameter | Type                                     | Required | Description                            |
 | --------- | ---------------------------------------- | -------- | -------------------------------------- |
 | str       | string                                   | ✅       | The string to convert to milliseconds. |
-| length    | boolean or [ParseOptions](#ParseOptions) | ❌       | If the result is converted to string.  |
-| options   | [ParseOptions](#ParseOptions)            | ❌       | The conversion options.                |
+| options   | boolean or [ParseOptions](#ParseOptions) | ❌       | The conversion options.                |
 
 ### ParseOptions
 
@@ -39,6 +39,7 @@ All properties are optional.
 | language  | string             | The language that will be used for the conversion. |
 | separator | string or string[] | The strings separator.                             |
 | strict    | boolean            | If the conversion run on strict mode.              |
+| length    | boolean            | If the result is converted to string.              |
 
 ## License
 
